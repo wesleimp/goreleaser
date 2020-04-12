@@ -3,7 +3,7 @@
 package xz
 
 import (
-	//"fmt"
+	"fmt"
 	"io"
 	"os"
 
@@ -12,28 +12,28 @@ import (
 
 // Archive as xz
 type Archive struct {
-	xzw *xz.Writer
+	xzw  *xz.Writer
+	name string
 }
 
 // Close all closeables
-func (a Archive) Close() error {
+func (a *Archive) Close() error {
 	return a.xzw.Close()
 }
 
 // New xz archive
-func New(target io.Writer) Archive {
+func New(target io.Writer) *Archive {
 	xzw, _ := xz.NewWriter(target)
-	return Archive{
+	return &Archive{
 		xzw: xzw,
 	}
 }
 
 // Add file to the archive
-func (a Archive) Add(name, path string) error {
-	/*
-	if a.xzw.Header.Name != "" {
+func (a *Archive) Add(name, path string) error {
+	if a.name != "" {
 		return fmt.Errorf("xz: failed to add %s, only one file can be archived in xz format", name)
-	} */
+	}
 	file, err := os.Open(path) // #nosec
 	if err != nil {
 		return err
@@ -46,8 +46,7 @@ func (a Archive) Add(name, path string) error {
 	if info.IsDir() {
 		return nil
 	}
-	//a.xzw.Header.Name = name
-	//a.xzw.Header.ModTime = info.ModTime()
 	_, err = io.Copy(a.xzw, file)
+	a.name = name
 	return err
 }

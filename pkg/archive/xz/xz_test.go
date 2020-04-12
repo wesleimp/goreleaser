@@ -28,7 +28,7 @@ func TestXzFile(t *testing.T) {
 	t.Log(f.Name())
 	f, err = os.Open(f.Name())
 	assert.NoError(err)
-	//defer f.Close() // nolint: errcheck
+	defer f.Close() // nolint: errcheck
 
 	info, err := f.Stat()
 	assert.NoError(err)
@@ -36,9 +36,6 @@ func TestXzFile(t *testing.T) {
 
 	xzf, err := xz.NewReader(f)
 	assert.NoError(err)
-	//defer xzf.Close() // nolint: errcheck
-
-	//assert.Equal("sub1/sub2/subfoo.txt", xzf.Name)
 
 	bts, err := ioutil.ReadAll(xzf)
 	assert.NoError(err)
